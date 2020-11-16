@@ -1,0 +1,29 @@
+.repositories-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 14px;
+  
+  h1 {
+    font-size: 22px;
+  }
+
+  .error {
+    color: red;
+  }
+
+  .spinner {
+    color: #666;
+  }
+
+  ul {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-start;
+    list-style: none;
+    padding: 0;
+    &.languages li {
+      margin: 0 20px;
+    }
+  }
+}
