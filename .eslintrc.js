@@ -15,5 +15,7 @@ module.exports = {
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     quotes: [2, 'double', { avoidEscape: true }],
     "object-curly-newline": ["warn", { "multiline": true }],
+    "camelcase": [2, { "ignoreDestructuring": true }],
+    "operator-linebreak": [2, "before", { "overrides": { "?": "after" } }],
   },
 };

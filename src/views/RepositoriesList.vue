@@ -24,20 +24,47 @@ export default {
     await this.loadRepositories(LANGUAGES[0]);
   },
   methods: {
-    async loadRepositories(language) {
-      this.selectedLanguage = language;
+    async loadRepositories(selectedLanguage) {
+      this.selectedLanguage = selectedLanguage;
       this.isLoading = true;
       try {
-        const url = `${API}?q=${QUERY_STR}+language:${language}&sort=${SORT_BY}&per_page=${COUNT}`;
-        const response = await axios.get(url);
-        const { data } = response;
+        const apiURL = `${API}?q=${QUERY_STR}+language:${selectedLanguage}&sort=${SORT_BY}&per_page=${COUNT}`;
+        const {
+          data: { items },
+        } = await axios.get(apiURL);
         this.isLoading = false;
-        this.repositories = data && data.items;
+        this.repositories = items.map(
+          ({
+            id,
+            name,
+            html_url: url,
+            owner: { avatar_url: logo },
+            stargazers_count: stars,
+            open_issues: openIssues,
+            homepage,
+            language,
+          }) => ({ id, name, url, logo, stars, openIssues, homepage, language }),
+        );
       } catch (e) {
-        console.log(JSON.stringify(e));
         this.isLoading = false;
         this.isError = true;
         this.message = `Can't load repositories: ${e.message}`;
+      }
+    },
+
+    async sendData() {
+      try {
+        this.isError = false;
+        await axios({
+          url: "http://localhost:3000/api/repositories",
+          method: "post",
+          data: {
+            repositories: this.repositories,
+          },
+        });
+      } catch (e) {
+        this.isError = true;
+        this.message = "Can't send data";
       }
     },
   },
@@ -65,33 +92,34 @@ export default {
       </li>
     </ul>
     <div v-if="isLoading" class="spinner">Loading...</div>
-    <div v-else-if="isError" class="error">{{ message }}</div>
     <div v-else>
+      <div v-if="isError" class="error">{{ message }}</div>
       <ul>
         <li
           :key="id"
           v-for="{
             id,
             name,
-            html_url,
-            owner: { avatar_url },
-            stargazers_count,
-            open_issues,
+            url,
+            logo,
+            stars,
+            openIssues,
             homepage,
             language,
           } in repositories"
         >
           <Repository
             :name="name"
-            :url="html_url"
-            :logo="avatar_url"
-            :stars="stargazers_count"
-            :openIssues="open_issues"
+            :url="url"
+            :logo="logo"
+            :stars="stars"
+            :openIssues="openIssues"
             :homepage="homepage"
             :language="language"
           />
         </li>
       </ul>
+      <button @click="sendData()">Save result</button>
     </div>
   </div>
 </template>
