@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+require("dotenv").config();
 
 process.on("message", async (repositories) => {
   const content = repositories.map(({ name, url }) => (`<tr><td>${name}</td><td>${url}</td></tr>`));
@@ -6,8 +7,8 @@ process.on("message", async (repositories) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
-      user: "antonina.krasnoshchok@gmail.com",
-      pass: "abbzvcbhjvedfuog",
+      user: process.env.EMAIL,
+      pass: process.env.PASSWORD,
     },
   });
 
