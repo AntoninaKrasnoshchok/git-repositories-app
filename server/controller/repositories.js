@@ -7,7 +7,6 @@ const { fork } = require("child_process");
 
 router.post("/", async (req, res) => {
   const { repositories } = req.body;
-  console.log(path.join(__dirname, "../files"));
 
   const forked = fork(path.join(__dirname, "../helpers/findRepository"));
   forked.on("message", (msg) => {

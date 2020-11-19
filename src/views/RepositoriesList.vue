@@ -56,7 +56,7 @@ export default {
       try {
         this.isError = false;
         await axios({
-          url: "http://localhost:3000/api/repositories",
+          url: `${process.env.VUE_APP_BASE_URL}/api/repositories`,
           method: "post",
           data: {
             repositories: this.repositories,
