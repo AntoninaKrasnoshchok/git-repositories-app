@@ -1,80 +1,3 @@
-<script>
-import axios from "axios";
-import Repository from "@/components/Repository.vue";
-
-import { API, QUERY_STR, SORT_BY, COUNT, LANGUAGES } from "../../config";
-
-export default {
-  name: "RepositoriesList",
-  components: {
-    Repository,
-  },
-  data() {
-    return {
-      isLoading: false,
-      isError: false,
-      message: "",
-      repositories: [],
-      languages: [],
-      selectedLanguage: LANGUAGES[0],
-    };
-  },
-  async mounted() {
-    this.languages = LANGUAGES;
-    await this.loadRepositories(LANGUAGES[0]);
-  },
-  methods: {
-    async loadRepositories(selectedLanguage) {
-      this.selectedLanguage = selectedLanguage;
-      this.isLoading = true;
-      try {
-        const apiURL = `${API}?q=${QUERY_STR}+language:${selectedLanguage}&sort=${SORT_BY}&per_page=${COUNT}`;
-        const {
-          data: { items },
-        } = await axios.get(apiURL);
-        this.isLoading = false;
-        this.repositories = items.map(
-          ({
-            id,
-            name,
-            html_url: url,
-            owner: { avatar_url: logo },
-            stargazers_count: stars,
-            open_issues: openIssues,
-            homepage,
-            language,
-          }) => ({ id, name, url, logo, stars, openIssues, homepage, language }),
-        );
-      } catch (e) {
-        this.isLoading = false;
-        this.isError = true;
-        this.message = `Can't load repositories: ${e.message}`;
-      }
-    },
-
-    async sendData() {
-      try {
-        this.isError = false;
-        await axios({
-          url: `${process.env.VUE_APP_BASE_URL}/api/repositories`,
-          method: "post",
-          data: {
-            repositories: this.repositories,
-          },
-        });
-      } catch (e) {
-        this.isError = true;
-        this.message = "Can't send data";
-      }
-    },
-  },
-};
-</script>
-
-<style lang="scss" scoped>
-@import "../styles/pages/RepositoriesList";
-</style>
-
 <template>
   <div class="repositories-list">
     <h1>Hithub repositories list</h1>
@@ -93,7 +16,8 @@ export default {
     </ul>
     <div v-if="isLoading" class="spinner">Loading...</div>
     <div v-else>
-      <div v-if="isError" class="error">{{ message }}</div>
+      <button @click="sendData()">Save result</button>
+      <div class="notification">{{ message }}</div>
       <ul>
         <li
           :key="id"
@@ -119,7 +43,81 @@ export default {
           />
         </li>
       </ul>
-      <button @click="sendData()">Save result</button>
     </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+@import "../styles/pages/RepositoriesList";
+</style>
+
+<script>
+import axios from "axios";
+import Repository from "@/components/Repository.vue";
+
+import { API, QUERY_STR, SORT_BY, COUNT, LANGUAGES } from "../../config";
+
+export default {
+  name: "RepositoriesList",
+  components: {
+    Repository,
+  },
+  data() {
+    return {
+      isLoading: false,
+      message: "",
+      repositories: [],
+      languages: [],
+      selectedLanguage: LANGUAGES[0],
+    };
+  },
+  async mounted() {
+    this.languages = LANGUAGES;
+    await this.loadRepositories(LANGUAGES[0]);
+  },
+  methods: {
+    async loadRepositories(selectedLanguage) {
+      this.selectedLanguage = selectedLanguage;
+      this.isLoading = true;
+      this.message = "";
+      try {
+        const apiURL = `${API}?q=${QUERY_STR}+language:${selectedLanguage}&sort=${SORT_BY}&per_page=${COUNT}`;
+        const {
+          data: { items },
+        } = await axios.get(apiURL);
+        this.isLoading = false;
+        this.repositories = items.map(
+          ({
+            id,
+            name,
+            html_url: url,
+            owner: { avatar_url: logo },
+            stargazers_count: stars,
+            open_issues: openIssues,
+            homepage,
+            language,
+          }) => ({ id, name, url, logo, stars, openIssues, homepage, language }),
+        );
+      } catch (e) {
+        this.isLoading = false;
+        this.message = `Can't load repositories: ${e.message}`;
+      }
+    },
+
+    async sendData() {
+      try {
+        await axios({
+          url: `${process.env.VUE_APP_BASE_URL}/api/repositories`,
+          method: "post",
+          data: {
+            repositories: this.repositories,
+          },
+        });
+        this.message = "Data saved";
+      } catch (e) {
+        this.message = "Can't save data";
+      }
+    },
+  },
+};
+</script>

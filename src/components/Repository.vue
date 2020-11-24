@@ -1,22 +1,3 @@
-<script>
-export default {
-  name: "ListItem",
-  props: {
-    name: String,
-    url: String,
-    logo: String,
-    stars: Number,
-    openIssues: Number,
-    homepage: String,
-    language: String,
-  },
-};
-</script>
-
-<style lang="scss" scoped>
-@import "../styles/components/ListItem.scss";
-</style>
-
 <template>
   <div class="listItem">
     <div>
@@ -39,3 +20,22 @@ export default {
     <div>&#9733;{{ stars }}</div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+@import "../styles/components/ListItem.scss";
+</style>
+
+<script>
+export default {
+  name: "ListItem",
+  props: {
+    name: String,
+    url: String,
+    logo: String,
+    stars: Number,
+    openIssues: Number,
+    homepage: String,
+    language: String,
+  },
+};
+</script>
